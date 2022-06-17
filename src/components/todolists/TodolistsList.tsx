@@ -1,11 +1,18 @@
 import React, {useEffect} from "react";
 import {TasksStateType} from "../../bll/taskReducer";
-import styles from './TodolistsList.module.css'
-import {useDispatch, useSelector} from "react-redux";
-import {AppRootStateType} from "../../bll/store";
-import { TodolistType} from "../../dall/todolists-api";
+import styles from './TodolistsList.module.scss'
+import {useSelector} from "react-redux";
+import {AppRootStateType, useAppDispatch} from "../../bll/store";
+import {TodolistType} from "../../dall/todolists-api";
 import {Todolist} from "./Todolist/Todolist";
-import { setTodolistsTC } from "../../bll/todolistsReducer";
+import {
+    addTodoAC,
+    addTodolistsTC,
+    changeTodolistsTC,
+    deleteTodolistsTC,
+    setTodolistsTC
+} from "../../bll/todolistsReducer";
+import {AddItemForm} from "./addItemForm/AddItemForm";
 
 
 export type TodolistsPropsType = {}
@@ -16,26 +23,36 @@ export const TodolistsList: React.FC<TodolistsPropsType> = (
 
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
     const todolists = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todolists)
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
-        // @ts-ignore
         dispatch(setTodolistsTC())
     }, [])
 
+    const addTodolist = (title: string) => {
+        dispatch(addTodolistsTC(title))
+    }
+
+    const deleteTodolist = (todolistId: string) => {
+        dispatch(deleteTodolistsTC(todolistId))
+    }
+
+    const changeTodolistTitle = (todolistId: string, newTitle: string) => {
+        dispatch(changeTodolistsTC(todolistId, newTitle))
+    }
+
     return (
         <div className={styles.todolistContainer}>
-            <div className={styles.addItemForm}>
-                <input type="text"/>
-                <button>+</button>
-            </div>
-            <div>
+            <AddItemForm addItem={addTodolist}/>
+            <div className={styles.todolistsList}>
                 {todolists.map(tl => {
-                    return <div key={tl.id}>
-                        <Todolist todolist={tl}
-                                  tasks={tasks[tl.id]}
-                        />
-                    </div>
+                    return <Todolist key={tl.id}
+                                     todolist={tl}
+                                     tasks={tasks[tl.id]}
+                                     deleteTodolist={deleteTodolist}
+                                     changeTodolistTitle={changeTodolistTitle}
+                    />
+
                 })}
             </div>
 

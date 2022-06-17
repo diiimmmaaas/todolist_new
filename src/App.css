@@ -1,5 +1,10 @@
 .App {
-    margin: 20px;
+    min-height: 100vh;
+    background: rgb(199, 194, 194);
     display: flex;
+}
+
+.container {
+    width: 100%;
 }
 

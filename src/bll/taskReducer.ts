@@ -1,4 +1,4 @@
-import {GET_TODOLISTS, GetTodoActionType} from "./todolistsReducer";
+import {ADD_TODOLISTS, AddTodoActionType, GET_TODOLISTS, GetTodoActionType} from "./todolistsReducer";
 import {TaskType, todolistsAPI} from "../dall/todolists-api";
 import {Dispatch} from "redux";
 
@@ -6,7 +6,10 @@ const DELETE_TASK = 'todolist/tasks/DELETE_TASK'
 const SET_TASK = 'todolist/tasks/SET_TASK'
 
 
-export type ActionType = DeleteTaskActionType | SetTaskActionType | GetTodoActionType
+export type ActionType = DeleteTaskActionType
+    | SetTaskActionType
+    | GetTodoActionType
+    | AddTodoActionType
 
 export type TasksStateType = {
     [key: string]: Array<TaskType>
@@ -25,6 +28,8 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
             })
             return copyState
         }
+        case ADD_TODOLISTS:
+            return {...state, [action.newTodo.id]: []}
         case DELETE_TASK:
             return {...state, [action.todolistId]: state[action.todolistId].filter(t => t.id !== action.taskId)}
         default:

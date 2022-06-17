@@ -1,0 +1,16 @@
+.header {
+  height: 100px;
+  background-color: #ad4d4d;
+  transition: transform .1s linear;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0;
+  width: 100%;
+  .container {
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    margin: 0 auto;
+  }
+}

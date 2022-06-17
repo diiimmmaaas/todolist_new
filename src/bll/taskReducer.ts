@@ -1,15 +1,18 @@
-import {ADD_TODOLISTS, AddTodoActionType, GET_TODOLISTS, GetTodoActionType} from "./todolistsReducer";
-import {TaskType, todolistsAPI} from "../dall/todolists-api";
+import {ADD_TODOLIST, AddTodoActionType, GET_TODOLISTS, GetTodoActionType} from "./todolistsReducer";
+import {TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelType} from "../dall/todolists-api";
 import {Dispatch} from "redux";
+import {AppRootStateType} from "./store";
 
 const DELETE_TASK = 'todolist/tasks/DELETE_TASK'
 const SET_TASK = 'todolist/tasks/SET_TASK'
+const UPDATE_TASK = 'todolist/tasks/UPDATE_TASK'
 
 
 export type ActionType = DeleteTaskActionType
     | SetTaskActionType
     | GetTodoActionType
     | AddTodoActionType
+| UpdateTaskActionType
 
 export type TasksStateType = {
     [key: string]: Array<TaskType>
@@ -28,10 +31,16 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
             })
             return copyState
         }
-        case ADD_TODOLISTS:
+        case ADD_TODOLIST:
             return {...state, [action.newTodo.id]: []}
         case DELETE_TASK:
             return {...state, [action.todolistId]: state[action.todolistId].filter(t => t.id !== action.taskId)}
+        case UPDATE_TASK:
+            return {
+                ...state,
+                [action.todolistId]: state[action.todolistId]
+                    .map(t => t.id === action.taskId ? {...t, ...action.model} : t)
+            }
         default:
             return state
     }
@@ -39,9 +48,16 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
 
 export type DeleteTaskActionType = ReturnType<typeof deleteTaskAC>
 export type SetTaskActionType = ReturnType<typeof setTaskAC>
+export type UpdateTaskActionType = ReturnType<typeof updateTaskAC>
 
 export const deleteTaskAC = (todolistId: string, taskId: string) => ({type: DELETE_TASK, todolistId, taskId} as const)
 export const setTaskAC = (tasks: Array<TaskType>, todolistId: string) => ({type: SET_TASK, tasks, todolistId} as const)
+export const updateTaskAC = (taskId: string, model: UpdateDomainTaskModelType, todolistId: string) => ({
+    type: UPDATE_TASK,
+    model,
+    todolistId,
+    taskId
+} as const)
 
 // thunk
 export const setTaskTC = (todolistId: string) => {
@@ -52,3 +68,40 @@ export const setTaskTC = (todolistId: string) => {
             })
     }
 }
+
+export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelType, todolistId: string) =>
+    (dispatch: Dispatch, getState: () => AppRootStateType) => {
+        const state = getState()
+        const task = state.tasks[todolistId].find(t => t.id === taskId)
+        if (!task) {
+            //throw new Error("task not found in the state");
+            console.warn('task not found in the state')
+            return
+        }
+
+        const apiModel: UpdateTaskModelType = {
+            deadline: task.deadline,
+            description: task.description,
+            priority: task.priority,
+            startDate: task.startDate,
+            title: task.title,
+            status: task.status,
+            ...domainModel
+        }
+
+        todolistsAPI.updateTask(todolistId, taskId, apiModel)
+            .then(res => {
+                    const action = updateTaskAC(taskId, domainModel, todolistId)
+                    dispatch(action)
+            })
+    }
+
+export type UpdateDomainTaskModelType = {
+    title?: string
+    description?: string
+    status?: TaskStatuses
+    priority?: TaskPriorities
+    startDate?: string
+    deadline?: string
+}
+

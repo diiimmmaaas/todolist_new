@@ -1,17 +1,21 @@
 import React, {useEffect} from "react";
 import {setTaskTC} from "../../../bll/taskReducer";
 import {Task} from "./Task/Task";
-import {TaskType, TodolistType} from "../../../dall/todolists-api";
+import {TaskStatuses, TaskType} from "../../../dall/todolists-api";
 import {useAppDispatch} from "../../../bll/store";
 import styles from './Todolist.module.scss'
 import {EditableSpan} from "../../EditableSpan/EditableSpan";
+import {FilterValuesType, TodolistDomainType} from "../../../bll/todolistsReducer";
 
 
 export type TodolistPropsType = {
     tasks: Array<TaskType>
-    todolist: TodolistType
+    todolist: TodolistDomainType
     deleteTodolist: (todolistId: string) => void
     changeTodolistTitle: (todolistId: string, newTitle: string) => void
+    changeTodolistFilter: (todolistId: string, newFilter: FilterValuesType) => void
+    changeTaskStatus: (id: string, status: TaskStatuses, todolistId: string) => void
+
 }
 
 export const Todolist: React.FC<TodolistPropsType> = (
@@ -19,7 +23,9 @@ export const Todolist: React.FC<TodolistPropsType> = (
         todolist,
         tasks,
         deleteTodolist,
-        changeTodolistTitle
+        changeTodolistTitle,
+        changeTodolistFilter,
+        changeTaskStatus
     }
 ) => {
 
@@ -38,6 +44,24 @@ export const Todolist: React.FC<TodolistPropsType> = (
         changeTodolistTitle(todolist.id, title)
     }
 
+    const onAllClickHandler = () => {
+        changeTodolistFilter(todolist.id, 'all')
+    }
+    const onActiveClickHandler = () => {
+        changeTodolistFilter(todolist.id, 'active')
+    }
+    const onCompletedClickHandler = () => {
+        changeTodolistFilter(todolist.id, 'completed')
+    }
+
+    let tasksForTodolist = tasks
+
+    if (todolist.filter === 'active') {
+        tasksForTodolist = tasks.filter(t => t.status === TaskStatuses.New)
+    }
+    if (todolist.filter === 'completed') {
+        tasksForTodolist = tasks.filter(t => t.status === TaskStatuses.Completed)
+    }
 
     return (
         <div className={styles.todolistBlock}>
@@ -50,14 +74,17 @@ export const Todolist: React.FC<TodolistPropsType> = (
                 <button>+</button>
             </div>
             <div className='tasks'>
-                {tasks.map(t => {
-                    return <Task key={t.id} task={t} todolistId={todolist.id}/>
+                {tasksForTodolist.map(t => {
+                    return <Task key={t.id}
+                                 task={t}
+                                 changeTaskStatus={changeTaskStatus}
+                                 todolistId={todolist.id}/>
                 })}
             </div>
             <div className='buttons'>
-                <button>All</button>
-                <button>Active</button>
-                <button>Completed</button>
+                <button onClick={onAllClickHandler}>All</button>
+                <button onClick={onActiveClickHandler}>Active</button>
+                <button onClick={onCompletedClickHandler}>Completed</button>
             </div>
         </div>
     )

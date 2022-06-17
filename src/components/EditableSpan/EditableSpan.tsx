@@ -12,8 +12,8 @@ export const EditableSpan: React.FC<EditableSpanPropsType> = (
         onChange
     }
 ) => {
-    const [value, setValue] = useState(title)
-    const [activateMode, setActivateMode] = useState(false)
+    const [value, setValue] = useState<string>(title)
+    const [activateMode, setActivateMode] = useState<boolean>(false)
 
     const onDoubleClickHandler = () => {
         setActivateMode(true)

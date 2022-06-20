@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {TasksStateType, updateTaskTC} from "../../bll/taskReducer";
+import {addTaskTC, deleteTaskTC, TasksStateType, updateTaskTC} from "../../bll/taskReducer";
 import styles from './TodolistsList.module.scss'
 import {useSelector} from "react-redux";
 import {AppRootStateType, useAppDispatch} from "../../bll/store";
@@ -12,7 +12,7 @@ import {
     TodolistDomainType
 } from "../../bll/todolistsReducer";
 import {AddItemForm} from "./addItemForm/AddItemForm";
-import { TaskStatuses } from "../../dall/todolists-api";
+import {TaskStatuses} from "../../dall/todolists-api";
 
 
 export type TodolistsPropsType = {}
@@ -49,6 +49,17 @@ export const TodolistsList: React.FC<TodolistsPropsType> = (
         dispatch(updateTaskTC(id, {status}, todolistId))
     }
 
+    const addTask = (todolistId: string, taskTitle: string) => {
+        dispatch(addTaskTC(todolistId, taskTitle))
+    }
+
+    const deleteTask = (todolistId: string, taskId: string) => {
+        dispatch(deleteTaskTC(todolistId, taskId))
+    }
+    const changeTaskTitle = (id: string, newTitle: string, todolistId: string) => {
+        dispatch(updateTaskTC(id, {title: newTitle}, todolistId))
+    }
+
     return (
         <div className={styles.todolistContainer}>
             <AddItemForm addItem={addTodolist}/>
@@ -61,6 +72,9 @@ export const TodolistsList: React.FC<TodolistsPropsType> = (
                                      changeTodolistTitle={changeTodolistTitle}
                                      changeTodolistFilter={changeTodolistFilter}
                                      changeTaskStatus={changeTaskStatus}
+                                     changeTaskTitle={changeTaskTitle}
+                                     addTask={addTask}
+                                     deleteTask={deleteTask}
                     />
 
                 })}

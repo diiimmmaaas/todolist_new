@@ -12,7 +12,7 @@ const rootReducer = combineReducers({
     tasks: tasksReducer,
     todolists: todolistsReducer,
     // app: appReducer,
-    // auth: authReducer
+    auth: authReducer
 })
 
 export type AppRootStateType = ReturnType<typeof rootReducer>

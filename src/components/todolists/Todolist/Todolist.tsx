@@ -6,6 +6,7 @@ import {useAppDispatch} from "../../../bll/store";
 import styles from './Todolist.module.scss'
 import {EditableSpan} from "../../EditableSpan/EditableSpan";
 import {FilterValuesType, TodolistDomainType} from "../../../bll/todolistsReducer";
+import {AddItemForm} from "../addItemForm/AddItemForm";
 
 
 export type TodolistPropsType = {
@@ -15,6 +16,9 @@ export type TodolistPropsType = {
     changeTodolistTitle: (todolistId: string, newTitle: string) => void
     changeTodolistFilter: (todolistId: string, newFilter: FilterValuesType) => void
     changeTaskStatus: (id: string, status: TaskStatuses, todolistId: string) => void
+    changeTaskTitle: (id: string, newTitle: string, todolistId: string) => void
+    addTask: (todolistId: string, taskTitle: string) => void
+    deleteTask: (todolistId: string, taskId: string) => void
 
 }
 
@@ -25,7 +29,10 @@ export const Todolist: React.FC<TodolistPropsType> = (
         deleteTodolist,
         changeTodolistTitle,
         changeTodolistFilter,
-        changeTaskStatus
+        changeTaskStatus,
+        addTask,
+        deleteTask,
+        changeTaskTitle
     }
 ) => {
 
@@ -53,6 +60,9 @@ export const Todolist: React.FC<TodolistPropsType> = (
     const onCompletedClickHandler = () => {
         changeTodolistFilter(todolist.id, 'completed')
     }
+    const addItem = (taskTitle: string) => {
+        addTask(todolist.id, taskTitle)
+    }
 
     let tasksForTodolist = tasks
 
@@ -69,16 +79,17 @@ export const Todolist: React.FC<TodolistPropsType> = (
                 <EditableSpan title={todolist.title} onChange={onChangeTodolistTitle}/>
                 <button onClick={onClickHandler}>X</button>
             </div>
-            <div>
-                <input/>
-                <button>+</button>
-            </div>
+            <AddItemForm addItem={addItem}/>
             <div className='tasks'>
                 {tasksForTodolist.map(t => {
                     return <Task key={t.id}
                                  task={t}
                                  changeTaskStatus={changeTaskStatus}
-                                 todolistId={todolist.id}/>
+                                 changeTaskTitle={changeTaskTitle}
+                                 deleteTask={deleteTask}
+                                 todolistId={todolist.id}
+
+                    />
                 })}
             </div>
             <div className='buttons'>

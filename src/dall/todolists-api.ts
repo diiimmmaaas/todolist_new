@@ -41,6 +41,9 @@ export const authAPI = {
     },
     logout() {
         return instance.delete<ResponseType<{data: {}}>>( 'auth/login',  )
+    },
+    me() {
+        return instance.get<ResponseType<{data: AuthMeParamsType}>>('auth/me')
     }
 }
 
@@ -57,6 +60,12 @@ export type ResponseType<D = {}> = {
     messages: Array<string>
     fieldsErrors: Array<string>
     data: D
+}
+
+export type AuthMeParamsType = {
+    id: number ,
+    email: string,
+    login: string
 }
 
 export type TodolistType = {

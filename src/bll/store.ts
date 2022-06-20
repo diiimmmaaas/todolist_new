@@ -11,7 +11,7 @@ import {useDispatch} from "react-redux";
 const rootReducer = combineReducers({
     tasks: tasksReducer,
     todolists: todolistsReducer,
-    // app: appReducer,
+    app: appReducer,
     auth: authReducer
 })
 

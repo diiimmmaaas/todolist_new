@@ -13,6 +13,7 @@ import {
 } from "../../bll/todolistsReducer";
 import {AddItemForm} from "./addItemForm/AddItemForm";
 import {TaskStatuses} from "../../dall/todolists-api";
+import { Navigate } from "react-router-dom";
 
 
 export type TodolistsPropsType = {}
@@ -21,11 +22,15 @@ export const TodolistsList: React.FC<TodolistsPropsType> = (
     {}
 ) => {
 
+    const isLoggedIn = useSelector<AppRootStateType, boolean>( state => state.auth.isLoggedIn)
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
     const todolists = useSelector<AppRootStateType, Array<TodolistDomainType>>(state => state.todolists)
     const dispatch = useAppDispatch()
 
     useEffect(() => {
+        if (!isLoggedIn) {
+            return
+        }
         dispatch(setTodolistsTC())
     }, [])
 
@@ -58,6 +63,10 @@ export const TodolistsList: React.FC<TodolistsPropsType> = (
     }
     const changeTaskTitle = (id: string, newTitle: string, todolistId: string) => {
         dispatch(updateTaskTC(id, {title: newTitle}, todolistId))
+    }
+
+    if (!isLoggedIn) {
+        return <Navigate to={'/login'}/>
     }
 
     return (
